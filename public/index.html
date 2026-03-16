@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Priority Scheduling Simulator</title>
+</head>
+<body>
+    <h2>Preemptive Priority Scheduling</h2>
+
+    <table id="table" border="1" cellpadding="8">
+        <tr>
+            <th>Arrival</th>
+            <th>Burst</th>
+            <th>Priority</th>
+        </tr>
+    </table>
+
+    <br>
+    <button onclick="addProcess()">Add Process</button>
+    <button onclick="runSimulation()">Run Simulation</button>
+
+    <h3>Output</h3>
+    <pre id="result"></pre>
+
+    <script>
+        function addProcess() {
+            const table = document.getElementById("table");
+            const row = table.insertRow();
+
+            row.innerHTML = `
+                <td><input type="number" min="0"></td>
+                <td><input type="number" min="1"></td>
+                <td><input type="number" min="1"></td>
+            `;
+        }
+
+        function runSimulation() {
+            const rows = document.querySelectorAll("#table tr");
+            const processes = [];
+
+            rows.forEach((row, i) => {
+                if (i === 0) return;
+
+                const inputs = row.querySelectorAll("input");
+                processes.push({
+                    arrival: inputs[0].value,
+                    burst: inputs[1].value,
+                    priority: inputs[2].value
+                });
+            });
+
+            fetch("/run", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ processes })
+            })
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById("result").textContent = data;
+            })
+            .catch(err => {
+                document.getElementById("result").textContent = "Error: " + err;
+            });
+        }
+    </script>
+</body>
+</html>
